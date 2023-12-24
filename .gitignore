@@ -1,0 +1,10 @@
+# Standard file extensions
+*.o
+*.out
+*.txt
+
+# test folder
+tests/*
+
+# Misc
+.vscode*
