@@ -19,7 +19,7 @@ static void	shift_buffer(char *buffer, size_t index)
 	size_t	_index;
 
 	_index = 0;
-	while (buffer[index] && index < (size_t)BUFFER_SIZE)
+	while (index < (size_t)BUFFER_SIZE && buffer[index])
 		buffer[_index++] = buffer[index++];
 	while (_index <= index && _index < (size_t)BUFFER_SIZE)
 		buffer[_index++] = '\0';
