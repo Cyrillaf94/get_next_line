@@ -6,13 +6,13 @@
 /*   By: cyril <cyril@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/24 00:29:24 by cyril             #+#    #+#             */
-/*   Updated: 2023/12/24 08:38:37 by cyril            ###   ########.fr       */
+/*   Updated: 2024/01/03 11:36:00 by cyril            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-t_list	*ft_lstnew(void *content, int fd)
+t_list	*ft_lstnew(void *content)
 {
 	t_list	*new;
 
@@ -20,7 +20,6 @@ t_list	*ft_lstnew(void *content, int fd)
 	if (new)
 	{
 		new->content = content;
-		new->fd = fd;
 		new->next = NULL;
 	}
 	return (new);
@@ -61,24 +60,21 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 	}
 }
 
-void	*ft_memmove(void *dest, const void *src, size_t n)
+void	*ft_calloc(size_t count, size_t size)
 {
-	unsigned char	*_src;
-	unsigned char	*_dest;
+	unsigned char		*ptr;
+	size_t				n_bytes;
 
-	_src = (unsigned char *)src;
-	_dest = (unsigned char *)dest;
-	if (_dest < _src || _dest >= _src + n)
-	{
-		while (n--)
-			*_dest++ = *_src++;
-	}
-	else
-	{
-		while (n--)
-			*(_dest + n) = *(_src + n);
-	}
-	return (dest);
+	if (size && count > (size_t) - 1 / size)
+		return (NULL);
+	n_bytes = count * size;
+	ptr = malloc(n_bytes);
+	if (!ptr)
+		return (NULL);
+	while (n_bytes--)
+		*ptr++ = 0;
+	ptr -= count * size;
+	return (ptr);
 }
 
 char	*ft_strndup(const char *src, size_t size)
@@ -87,7 +83,7 @@ char	*ft_strndup(const char *src, size_t size)
 	size_t	len;
 
 	len = 0;
-	while (src[len] && len < size)
+	while (len < size && src[len])
 		len ++;
 	ptr = malloc((len + 1) * sizeof(char));
 	if (!ptr)

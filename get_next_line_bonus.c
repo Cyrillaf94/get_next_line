@@ -1,6 +1,6 @@
 /* ************************************************************************** */
 /*																			*/
-/*													    :::      ::::::::   */
+/*												        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cyril <cyril@student.42.fr>                +#+  +:+       +#+        */
@@ -12,20 +12,17 @@
 
 #include "get_next_line_bonus.h"
 #include <unistd.h>
+#include <stdio.h>
 
-static void	shift_and_nullpad_buffer(char *buffer, size_t i)
+static void	shift_buffer(char *buffer, size_t index)
 {
-	// size_t len;
+	size_t	_index;
 
-	// len = 0;
-	// while (buffer[len] && len <= BUFFER_SIZE)
-	// 	len++;
-	ft_memmove((void *)buffer, (void *)(buffer + i + 1), BUFFER_SIZE - i);
-	while (i)
-	{
-		buffer[(BUFFER_SIZE - 1) - i] = '\0';
-		i--;
-	}
+	_index = 0;
+	while (buffer[index] && index < (size_t)BUFFER_SIZE)
+		buffer[_index++] = buffer[index++];
+	while (_index <= index && _index < (size_t)BUFFER_SIZE)
+		buffer[_index++] = '\0';
 }
 
 static void	get_next_buffer(t_list **list, char *buffer, int fd)
@@ -44,8 +41,8 @@ static void	get_next_buffer(t_list **list, char *buffer, int fd)
 		line = ft_strndup(buffer, i + 1);
 		if (!line)
 			return (ft_lstclear(list, &free));
-		ft_lstadd_back(list, ft_lstnew((void *)line, -1));
-		shift_and_nullpad_buffer(buffer, i);
+		ft_lstadd_back(list, ft_lstnew((void *)line));
+		shift_buffer(buffer, i + 1);
 	}
 	if (c != '\n')
 	{
@@ -80,8 +77,6 @@ static char	*concat_list(t_list *list)
 
 	total_length = 0;
 	current = list;
-	if (!list)
-		return (NULL);
 	while (current != NULL)
 	{
 		str = (char *)current->content;
@@ -93,31 +88,24 @@ static char	*concat_list(t_list *list)
 	if (result == NULL)
 		return (NULL);
 	fill_concat_str(result, list);
-	ft_lstclear(&list, &free);
 	return (result);
 }
 
 char	*get_next_line(int fd)
 {
-	static t_list		*fd_buf;
-	t_list				*current;
-	t_list				*list;
-	char				*buffer;
+	static char	*buffer[1024];
+	t_list		*list;
+	char		*result;
 
+	list = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	current = fd_buf;
-	while (current && current->fd != fd)
-		current = current->next;
-	if (!current)
-	{
-		buffer = malloc(BUFFER_SIZE * sizeof(char));
-		shift_and_nullpad_buffer(buffer, BUFFER_SIZE - 1);
-		current = ft_lstnew(buffer, fd);
-	}
-	current->next = fd_buf;
-	fd_buf = current;
-	list = NULL;
-	get_next_buffer(&list, current->content, current->fd);
-	return (concat_list(list));
+	if (!buffer[fd])
+		buffer[fd] = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
+	get_next_buffer(&list, buffer[fd], fd);
+	if (list == NULL)
+		return (NULL);
+	result = concat_list(list);
+	ft_lstclear(&list, &free);
+	return (result);
 }

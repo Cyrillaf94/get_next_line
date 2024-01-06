@@ -12,20 +12,17 @@
 
 #include "get_next_line.h"
 #include <unistd.h>
+#include <stdio.h>
 
-static void	shift_and_nullpad_buffer(char *buffer, size_t i)
+static void	shift_buffer(char *buffer, size_t index)
 {
-	size_t len;
+	size_t	_index;
 
-	len = 0;
-	while (buffer[len] && len <= BUFFER_SIZE)
-		len++;
-	ft_memmove((void *)buffer, (void *)(buffer + i + 1), len - i);
-	while (i)
-	{
-		buffer[(BUFFER_SIZE - 1) - i] = '\0';
-		i--;
-	}
+	_index = 0;
+	while (buffer[index] && index < (size_t)BUFFER_SIZE)
+		buffer[_index++] = buffer[index++];
+	while (_index <= index && _index < (size_t)BUFFER_SIZE)
+		buffer[_index++] = '\0';
 }
 
 static void	get_next_buffer(t_list **list, char *buffer, int fd)
@@ -45,7 +42,7 @@ static void	get_next_buffer(t_list **list, char *buffer, int fd)
 		if (!line)
 			return (ft_lstclear(list, &free));
 		ft_lstadd_back(list, ft_lstnew((void *)line));
-		shift_and_nullpad_buffer(buffer, i);
+		shift_buffer(buffer, i + 1);
 	}
 	if (c != '\n')
 	{

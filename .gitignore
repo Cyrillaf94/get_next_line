@@ -4,7 +4,7 @@
 *.txt
 
 # test folder
-tests/*
+testeur*
 
 # Misc
 .vscode*
